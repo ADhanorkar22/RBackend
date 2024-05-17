@@ -1,4 +1,12 @@
 const Provider = require('../models/provider');
+const jwt = require("jsonwebtoken");
+
+const {
+ 
+  getUserById,
+  
+} = require("../models/dbOperations");
+
 
 const providerController = {
   createRecord: (req, res) => {
@@ -67,7 +75,7 @@ const providerController = {
     }
    },
    ///
-   changeStatusById: async(req, res) => {
+   changeStatusInActiveById: async(req, res) => {
 
     const token = req.headers.authorization; // Token sent directly without "Bearer " prefix
     console.log(token);
@@ -85,7 +93,40 @@ const providerController = {
     const  id = req.params.id;
    // const newData = req.body;
     try {
-      const success = await  Provider.updateStatusdById(id);
+      const success = await  Provider.updateStatusInActiveById(id);
+      console.log("susess",success)
+      if (success) {
+        res.status(200).json({ message: "Record updated successfully" });
+      } else {
+        res.status(404).json({ error: "Record not found" });
+      }
+    } catch (err) {
+      console.error("Error updating record:", err);
+      res.status(500).json({ error: "Internal server error" });
+    }
+   },
+
+
+
+   changeStatusActiveById: async(req, res) => {
+
+    const token = req.headers.authorization; // Token sent directly without "Bearer " prefix
+    console.log(token);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+    const users = await getUserById(userId);
+     if (users.user_type !== "Admin") {
+       return res.status(403).json({
+         message:
+           "Unauthorized access. Only Admin users are permitted to use this functionality.",
+       });
+     }
+  
+  
+    const  id = req.params.id;
+   // const newData = req.body;
+    try {
+      const success = await  Provider.updateStatusActiveById(id);
       console.log("susess",success)
       if (success) {
         res.status(200).json({ message: "Record updated successfully" });

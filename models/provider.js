@@ -170,6 +170,42 @@ try{
     throw err;
   }
 },
+updateStatusInActiveById : async (recordId) => {
+  const Inactive='Not Active';
+  const sql = `UPDATE users SET status = ? WHERE user_id = ?`;
+
+  const values = [Inactive,recordId];
+
+  try {
+      const result = await pool.query(sql, values);
+      console.log("result affected ", result[0].affectedRows); 
+      return result[0].affectedRows > 0; 
+  } catch (err) {
+      throw err; 
+  }
+},
+
+
+updateStatusActiveById : async (recordId) => {
+  const Inactive='Active';
+  const sql = `UPDATE users SET status = ? WHERE user_id = ?`;
+
+  const values = [Inactive,recordId];
+
+  try {
+      const result = await pool.query(sql, values);
+      console.log("result affected ", result[0].affectedRows); 
+      return result[0].affectedRows > 0; 
+  } catch (err) {
+      throw err; 
+  }
+},
+
+
+
+
+
+
 };
 
 module.exports = Provider;

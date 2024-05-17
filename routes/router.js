@@ -171,12 +171,15 @@ router.put(
 
 router.delete(
   "/delete/user/:id",
-
   providerController.deleteRecordById
 );
+router.put("/changeStatusInActive/:id",providerController.changeStatusInActiveById);
+router.put("/changeStatusActive/:id",providerController.changeStatusActiveById);
 
-router.put("/changeStatus/:id",providerController.changeStatusById);
+
 router.post("/create/retailer", verifyToken, retailerController.createRecord);
+
+
 router.get("/get/retailer/:id", verifyToken, retailerController.getRecordById);
 router.get("/get/retailer", verifyToken, retailerController.getAllRecords);
 router.put(
