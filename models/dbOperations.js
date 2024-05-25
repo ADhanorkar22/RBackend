@@ -198,7 +198,7 @@ async function createUser(
     const hashedPassword = await bcrypt.hash(password, 10);
     // const [result] = await db.execute(
     const [result] = await pool.query(
-      "INSERT INTO users (user_id, name, email, password, user_type, parent_id, category, middle_name, last_name, mobile_number, outlet_name, aadharcard_number, gstin, date_of_birth, bank_account_number, ifsc, address, pincode, district, state, city, alternate_number, pancard_number,commissionSurcharge, percentage) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)",
+      "INSERT INTO users (user_id, name, email, password, user_type, parent_id, category, middle_name, last_name, mobile_number, outlet_name, aadharcard_number, gstin, date_of_birth, bank_account_number, ifsc, address, pincode, district, state, city, alternate_number, pancard_number,commissionSurcharge, percentage,original_password) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)",
       [
         userId,
         name,
@@ -223,8 +223,10 @@ async function createUser(
         city,
         alternateNumber,
         pancardNumber,
-        commissionSurcharge ,
-       parseFloat(percentage)
+        commissionSurcharge,
+        parseFloat(percentage),
+        password
+
       ]
     );
     return result.insertId;
@@ -244,7 +246,7 @@ async function getUserById(userId) {
     throw new Error(`Error getting user by ID: ${error.message}`);
   }
 }
- 
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function getUserById1(userId) {
   const query = `
@@ -311,13 +313,7 @@ async function getUsersUnderUser(userId, user_Type) {
 
 async function createTransaction(
   req,
-  senderName,
-  senderType,
-  receiverId,
-  receiverName,
-  receiverType,
-  amount,
-  reason
+  amount, reason, receiverId, receiverName, receiverType, senderName, senderType
 ) {
   let connection; // Declare connection variable outside try-catch block
   try {
@@ -376,14 +372,14 @@ async function getAllTransactions(req, res) {
 }
 async function getUserTransactions(userId) {
   try {
-   // console.log("njsijsn");
-   // const userId = req.userId;
+    // console.log("njsijsn");
+    // const userId = req.userId;
     console.log(userId);
     const [rows] = await pool.query(
       "SELECT * FROM transactions WHERE sender_id = ? OR receiver_id = ?",
       [userId, userId]
     );
-    return(rows);
+    return (rows);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

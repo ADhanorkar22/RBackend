@@ -173,8 +173,11 @@ router.delete(
   "/delete/user/:id",
   providerController.deleteRecordById
 );
-router.put("/changeStatusInActive/:id",providerController.changeStatusInActiveById);
-router.put("/changeStatusActive/:id",providerController.changeStatusActiveById);
+router.get("/mpmdata", verifyToken, providerController.verifympmGetdataById)
+
+
+router.put("/changeStatusInActive/:id", providerController.changeStatusInActiveById);
+router.put("/changeStatusActive/:id", providerController.changeStatusActiveById);
 
 
 router.post("/create/retailer", verifyToken, retailerController.createRecord);

@@ -88,7 +88,7 @@ router.get("/underme", async (req, res) => {
 // TRANSFER MONEY WALLET TO WALLET
 router.post("/transfer", verifyToken, async (req, res) => {
   try {
-    const { receiverId, receiverName, receiverType, amount, reason } = req.body;
+    const { amount, reason,receiverId,receiverName,receiverType,senderName,senderType} = req.body;
     const senderUserId = req.userId; // Get sender's user ID from the token
     // console.log(senderUserId); // console
     // Check if the receiver is under the sender
@@ -103,18 +103,12 @@ router.post("/transfer", verifyToken, async (req, res) => {
         .json({ message: "Receiver is not under the sender" });
     }
     // Sender's name and type can be retrieved from req.userId if needed
-    const senderName = "Sender Name"; // Example
-    const senderType = "Sender Type"; // Example
+   // const senderName = "Sender Name"; // Example
+   // const senderType = "Sender Type"; // Example
     // Call the createTransaction function with the provided details
     const transactionId = await createTransaction(
       req,
-      senderName,
-      senderType,
-      receiverId,
-      receiverName,
-      receiverType,
-      amount,
-      reason
+      amount, reason,receiverId,receiverName,receiverType,senderName,senderType
     );
     res
       .status(201)

@@ -33,7 +33,7 @@ app.use(cookieParser());
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // // Customized CORS options (optional):
 const corsOptions = {
-  origin: 'https://www.rockkpay.com', // Allow requests from only from this specific origin
+  origin: 'https://rockkpay.com',  // Allow requests from only from this specific origin
   methods: 'GET,POST', // Allow only specified HTTP methods
   allowedHeaders: 'Content-Type,Authorization', // Allow only specified headers
   optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -121,9 +121,37 @@ app.post("/initiate-web-payment", async (req, res) => {
   } catch (error) {
     console.error("Error initiating payment:", error.message);
     res.status(500).json({ status: 0, message: "Error initiating payment" });
+  
   }
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+app.post('/payment-webhook', async (req, res) => {
+  console.log('Received webhook request:', req.body);
+  try {
+    const { txnid } = req.body; // Ensure that txnid is sent in the webhook data
+    const inputString = `${key}|${txnid}|${salt}`;
+    const hash = crypto.createHash('sha512').update(inputString).digest('hex');
+    const params = new URLSearchParams();
+    params.append('txnid', txnid);
+    params.append('key', key);
+    params.append('hash', hash);
+    const response = await axios.post('https://dashboard.easebuzz.in/transaction/v2/retrieve', params, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+      },
+    });
+    const transactionData = response.data;
+    // Process the transaction data as needed
+    console.log('Transaction data:', transactionData);
+    res.json({ status: 1, message: 'Webhook received and processed' });
+  } catch (error) {
+    console.error('Error processing webhook:', error.message);
+    res.status(500).json({ status: 0, message: 'Error processing webhook' });
+  }
+});
+
 
 // POST ENDPOINT FOR Transaction API V2 ///////////////////////////////////////////////////////////////////////////////////////
 app.post('/transaction-api-v2', async (req, res) => {
@@ -143,6 +171,7 @@ app.post('/transaction-api-v2', async (req, res) => {
         'Accept': 'application/json'
       }
     });
+    console.log(response.data);
     res.json(response.data);
   } catch (error) {
     console.error('Error initiating payment:', error.message);
